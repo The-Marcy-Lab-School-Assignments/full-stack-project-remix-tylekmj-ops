@@ -4,8 +4,8 @@ const pool = require('./pool');
 const SALT_ROUNDS = 8;
 
 const seed = async () => {
-  // Drop tables in reverse dependency order (todos references users via FK)
-  await pool.query('DROP TABLE IF EXISTS todos');
+  // Drop tables in reverse dependency order (applications references users via FK)
+  await pool.query('DROP TABLE IF EXISTS applications');
   await pool.query('DROP TABLE IF EXISTS users');
 
   await pool.query(`
@@ -17,11 +17,13 @@ const seed = async () => {
   `);
 
   await pool.query(`
-    CREATE TABLE todos (
-      todo_id     SERIAL PRIMARY KEY,
-      title       TEXT NOT NULL,
-      is_complete BOOLEAN NOT NULL DEFAULT FALSE,
-      user_id     INT REFERENCES users(user_id) ON DELETE CASCADE
+    CREATE TABLE applications (
+      application_id  SERIAL PRIMARY KEY,
+      company         TEXT NOT NULL,
+      job_title       TEXT NOT NULL,
+      application_url TEXT,
+      status          TEXT NOT NULL DEFAULT 'Applied',
+      user_id         INT REFERENCES users(user_id) ON DELETE CASCADE
     )
   `);
 
@@ -42,13 +44,13 @@ const seed = async () => {
   const [alice, bob] = users;
 
   await pool.query(`
-    INSERT INTO todos (title, is_complete, user_id) VALUES
-      ('Buy groceries',        FALSE, $1),
-      ('Walk the dog',         FALSE, $1),
-      ('Read a book',          TRUE,  $1),
-      ('Set up the database',  TRUE,  $2),
-      ('Build the API',        TRUE,  $2),
-      ('Build the frontend',   FALSE, $2)
+    INSERT INTO applications (company, job_title, application_url, status, user_id) VALUES
+      ('Google',   'Frontend Engineer',    'https://careers.google.com/1',  'Applied',      $1),
+      ('Spotify',  'Software Engineer',    'https://spotify.com/jobs/2',    'Interviewing', $1),
+      ('Airbnb',   'Full-Stack Developer', 'https://careers.airbnb.com/3',  'Rejected',     $1),
+      ('Meta',     'React Developer',      'https://metacareers.com/4',     'Applied',      $2),
+      ('Stripe',   'Backend Engineer',     'https://stripe.com/jobs/5',     'Offered',      $2),
+      ('Vercel',   'DevOps Engineer',      'https://vercel.com/careers/6',  'Interviewing', $2)
   `, [alice.user_id, bob.user_id]);
 
   return users;

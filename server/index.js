@@ -6,7 +6,7 @@ require('dotenv').config();
 const logRoutes = require('./middleware/logRoutes');
 const checkAuthentication = require('./middleware/checkAuthentication');
 const authControllers = require('./controllers/authControllers');
-const todoControllers = require('./controllers/todoControllers');
+const applicationControllers = require('./controllers/applicationControllers');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -18,10 +18,6 @@ const PORT = process.env.PORT || 8080;
 app.use(logRoutes);
 app.use(cookieSession({ name: 'session', secret: process.env.SESSION_SECRET }));
 app.use(express.json());
-
-// In production, serve the built React app from frontend/dist.
-// In development, Vite's dev server handles the frontend on a separate port
-// and proxies /api requests to this server.
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 // ====================================
@@ -34,13 +30,13 @@ app.get('/api/auth/me', authControllers.getMe);
 app.delete('/api/auth/logout', authControllers.logout);
 
 // ====================================
-// Todo routes (all require authentication)
+// Application routes (all require authentication)
 // ====================================
 
-app.get('/api/todos', checkAuthentication, todoControllers.listTodos);
-app.post('/api/todos', checkAuthentication, todoControllers.createTodo);
-app.patch('/api/todos/:todo_id', checkAuthentication, todoControllers.updateTodo);
-app.delete('/api/todos/:todo_id', checkAuthentication, todoControllers.deleteTodo);
+app.get('/api/applications', checkAuthentication, applicationControllers.listApplications);
+app.post('/api/applications', checkAuthentication, applicationControllers.createApplication);
+app.patch('/api/applications/:application_id', checkAuthentication, applicationControllers.updateApplication);
+app.delete('/api/applications/:application_id', checkAuthentication, applicationControllers.deleteApplication);
 
 // ====================================
 // Global Error Handler

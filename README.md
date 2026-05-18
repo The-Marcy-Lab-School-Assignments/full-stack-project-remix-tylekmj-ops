@@ -1,6 +1,8 @@
-# Job Application Tracker App — Full-Stack Case Study
+# Job Application Tracker App
 
 A full-stack job application tracker app built with React, Express, and Postgres. Demonstrates session-based authentication, session rehydration, auth-dependent data fetching, and conditional rendering — the same patterns students use in their full-stack projects.
+
+This application is built to make navigating todays job market more bearable. Made for people currently on the job hunt and wants to stay organized throughout the process. Instead of losing track of applications across spreadsheets, notes apps, and memory, users get a single place to log every application, record where they applied, and keep tabs on where things stand. The goal is to reduce the mental overhead of a job search so users can focus on preparing for interviews rather than remembering who they applied to.
 
 ## User Stories
 
@@ -25,7 +27,7 @@ user_id       SERIAL PRIMARY KEY
 username      TEXT UNIQUE NOT NULL
 password_hash TEXT NOT NULL
 
-job_applications
+applications
 ─────────────────────────────
 application_id      SERIAL PRIMARY KEY
 company             TEXT NOT NULL
