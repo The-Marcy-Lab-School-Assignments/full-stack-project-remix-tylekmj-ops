@@ -66,7 +66,7 @@ A user has many job applications. Deleting a user cascades to delete all of thei
 Create a local Postgres database:
 
 ```sh
-createdb todos_casestudy
+createdb job_applications
 ```
 
 ### 2. Server
@@ -115,7 +115,7 @@ After running `npm run db:seed`, these accounts are available:
 ## Application Structure
 
 ```
-swe-casestudy-7-todo-app/
+full-stack-project-remix-tylek/
 ├── frontend/               # React app (Vite)
 │   ├── src/
 │   │   ├── App.jsx         # Root component: currentUser state, session rehydration, auth handlers
