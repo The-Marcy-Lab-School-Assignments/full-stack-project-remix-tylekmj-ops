@@ -11,13 +11,17 @@ module.exports.listApplications = async (req, res, next) => {
 
 module.exports.createApplication = async (req, res, next) => {
   try {
-    const { company, job_title, application_url } = req.body;
-    if (!company || !job_title) {
-      return res.status(400).send({ error: 'Company and job title are required.' });
+    const { job_id } = req.body;
+    if (!job_id) {
+      return res.status(400).send({ error: 'job_id is required.' });
     }
-    const application = await applicationModel.create({ company, job_title, application_url }, req.session.user_id);
+    const application = await applicationModel.create(job_id, req.session.user_id);
     res.status(201).send(application);
   } catch (err) {
+    // Unique constraint violation — user already applied to this job
+    if (err.code === '23505') {
+      return res.status(409).send({ error: 'You have already added this job to your tracker.' });
+    }
     next(err);
   }
 };
@@ -40,15 +44,11 @@ module.exports.updateApplication = async (req, res, next) => {
 module.exports.deleteApplication = async (req, res, next) => {
   try {
     const { application_id } = req.params;
-
-    // First find the application to verify ownership
     const application = await applicationModel.find(application_id);
     if (!application) return res.status(404).send({ error: 'Application not found.' });
     if (application.user_id !== req.session.user_id) {
       return res.status(403).send({ error: 'Not authorized.' });
     }
-
-    // Destroy the application only after ownership has been verified
     const destroyedApplication = await applicationModel.destroy(application_id);
     res.send(destroyedApplication);
   } catch (err) {

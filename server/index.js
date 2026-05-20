@@ -7,13 +7,10 @@ const logRoutes = require('./middleware/logRoutes');
 const checkAuthentication = require('./middleware/checkAuthentication');
 const authControllers = require('./controllers/authControllers');
 const applicationControllers = require('./controllers/applicationControllers');
+const jobControllers = require('./controllers/jobControllers');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-
-// ====================================
-// Middleware
-// ====================================
 
 app.use(logRoutes);
 app.use(cookieSession({ name: 'session', secret: process.env.SESSION_SECRET }));
@@ -28,6 +25,13 @@ app.post('/api/auth/register', authControllers.register);
 app.post('/api/auth/login', authControllers.login);
 app.get('/api/auth/me', authControllers.getMe);
 app.delete('/api/auth/logout', authControllers.logout);
+
+// ====================================
+// Job board routes (public — no auth required)
+// ====================================
+
+app.get('/api/jobs', jobControllers.listJobs);
+app.post('/api/jobs', jobControllers.createJob);
 
 // ====================================
 // Application routes (all require authentication)
@@ -47,9 +51,5 @@ const handleError = (err, req, res, next) => {
   res.status(500).send({ message: 'Internal Server Error' });
 };
 app.use(handleError);
-
-// ====================================
-// Listen
-// ====================================
 
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
