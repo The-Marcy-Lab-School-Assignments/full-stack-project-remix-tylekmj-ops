@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { getMe, login, register, logout } from './adapters/auth-adapters';
 import AuthPage from './components/AuthPage';
-import TodoPage from './components/TodoPage';
+import ApplicationPage from './components/ApplicationPage';
+import JobBoardPage from './components/JobBoardPage';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
+  const [currentPage, setCurrentPage] = useState('tracker');
 
-  // On every page load, check the server for an active session cookie.
-  // React state doesn't survive a refresh; session cookies do.
   useEffect(() => {
     const checkForSession = async () => {
       const { data: user } = await getMe();
@@ -16,9 +16,6 @@ function App() {
     checkForSession();
   }, []);
 
-  // Handlers that manage updating the current user. 
-  // Defined in App to ensure that child components only                       
-  // update the current user in a controlled manner.  
   const handleLogin = async (username, password) => {
     const { data: user, error } = await login(username, password);
     if (error) return error;
@@ -34,16 +31,42 @@ function App() {
   const handleLogout = async () => {
     await logout();
     setCurrentUser(null);
+    setCurrentPage('tracker');
   };
 
   return (
-    <main>
-      <h1>Todo App</h1>
-      {currentUser
-        ? <TodoPage currentUser={currentUser} handleLogout={handleLogout} />
-        : <AuthPage handleLogin={handleLogin} handleRegister={handleRegister} />
-      }
-    </main>
+    <>
+      <header>
+        <h1>Job Application <span>Tracker</span></h1>
+        {currentUser && (
+          <nav>
+            <button
+              className={`nav-btn ${currentPage === 'tracker' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('tracker')}
+            >
+              My Applications
+            </button>
+            <button
+              className={`nav-btn ${currentPage === 'jobs' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('jobs')}
+            >
+              Job Board
+            </button>
+          </nav>
+        )}
+      </header>
+      <main>
+        {!currentUser && (
+          <AuthPage handleLogin={handleLogin} handleRegister={handleRegister} />
+        )}
+        {currentUser && currentPage === 'tracker' && (
+          <ApplicationPage currentUser={currentUser} handleLogout={handleLogout} />
+        )}
+        {currentUser && currentPage === 'jobs' && (
+          <JobBoardPage currentUser={currentUser} />
+        )}
+      </main>
+    </>
   );
 }
 
